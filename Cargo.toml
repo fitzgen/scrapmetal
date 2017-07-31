@@ -4,3 +4,8 @@ version = "0.1.0"
 authors = ["Nick Fitzgerald <fitzgen@gmail.com>"]
 
 [dependencies]
+
+[features]
+# Not for general use. Exports some testing types for use with `#[bench]`
+# functions.
+bench = []

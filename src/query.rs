@@ -7,8 +7,6 @@ use std::marker::PhantomData;
 
 // TODO: Don't return `Vec<R>`, call a callback instead.
 
-// TODO: benchmark the boilerplate vs scrapped versions.
-
 /// A similar work around as `TransformAll`, but returning a query type, rather
 /// than the same type. This is roughly equivalent to `for<T> FnMut(&T) -> R`.
 pub trait QueryAll<R> {

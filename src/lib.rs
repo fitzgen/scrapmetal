@@ -8,8 +8,8 @@
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 
-#[cfg(tests)]
-mod company;
+#[cfg(any(test, feature = "bench"))]
+pub mod company;
 
 mod query;
 mod term_impls;
