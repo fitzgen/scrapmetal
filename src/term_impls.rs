@@ -1,24 +1,24 @@
-use super::{MutateAll, QueryAll, Term, TransformAll};
+use super::{MutateForAll, QueryForAll, Term, TransformForAll};
 
 macro_rules! impl_trivial_term {
     ( $name:ty ) => {
         impl Term for $name {
             fn map_one_transform<F>(self, _: &mut F) -> Self
             where
-                F: TransformAll,
+                F: TransformForAll,
             {
                 self
             }
 
             fn map_one_query<Q, R, F>(&self, _: &mut Q, _: F)
             where
-                Q: QueryAll<R>,
+                Q: QueryForAll<R>,
                 F: FnMut(&mut Q, R),
             {}
 
             fn map_one_mutation<M, R, F>(&mut self, _: &mut M, _: F)
             where
-                M: MutateAll<R>,
+                M: MutateForAll<R>,
                 F: FnMut(&mut M, R),
             {}
         }
@@ -37,14 +37,14 @@ where
 {
     fn map_one_transform<F>(mut self, f: &mut F) -> Vec<T>
     where
-        F: TransformAll,
+        F: TransformForAll,
     {
         self.drain(..).map(|t| f.transform(t)).collect()
     }
 
     fn map_one_query<Q, R, F>(&self, query: &mut Q, mut each: F)
     where
-        Q: QueryAll<R>,
+        Q: QueryForAll<R>,
         F: FnMut(&mut Q, R),
     {
         self.iter()
@@ -57,7 +57,7 @@ where
 
     fn map_one_mutation<M, R, F>(&mut self, mutation: &mut M, mut each: F)
     where
-        M: MutateAll<R>,
+        M: MutateForAll<R>,
         F: FnMut(&mut M, R),
     {
         self.iter_mut()
@@ -75,14 +75,14 @@ where
 {
     fn map_one_transform<F>(self, f: &mut F) -> Box<T>
     where
-        F: TransformAll,
+        F: TransformForAll,
     {
         Box::new(f.transform(*self))
     }
 
     fn map_one_query<Q, R, F>(&self, query: &mut Q, mut each: F)
     where
-        Q: QueryAll<R>,
+        Q: QueryForAll<R>,
         F: FnMut(&mut Q, R),
     {
         let r = query.query(&**self);
@@ -91,7 +91,7 @@ where
 
     fn map_one_mutation<M, R, F>(&mut self, mutation: &mut M, mut each: F)
     where
-        M: MutateAll<R>,
+        M: MutateForAll<R>,
         F: FnMut(&mut M, R),
     {
         let r = mutation.mutate(&mut **self);

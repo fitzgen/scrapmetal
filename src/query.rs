@@ -5,9 +5,9 @@ use std::marker::PhantomData;
 
 // TODO: subtree filtering
 
-/// A similar work around as `TransformAll`, but returning a query type, rather
+/// A similar work around as `TransformForAll`, but returning a query type, rather
 /// than the same type. This is roughly equivalent to `for<T> FnMut(&T) -> R`.
-pub trait QueryAll<R> {
+pub trait QueryForAll<R> {
     /// Call the query function on any `T`.
     fn query<T>(&mut self, t: &T) -> R
     where
@@ -63,7 +63,7 @@ where
     }
 }
 
-impl<Q, U, D, R> QueryAll<R> for Query<Q, U, D, R>
+impl<Q, U, D, R> QueryForAll<R> for Query<Q, U, D, R>
 where
     Q: FnMut(&U) -> R,
     D: FnMut() -> R,
@@ -86,7 +86,7 @@ where
 #[derive(Debug)]
 pub struct Everything<Q, R, F>
 where
-    Q: QueryAll<R>,
+    Q: QueryForAll<R>,
     F: FnMut(R, R) -> R,
 {
     q: Q,
@@ -96,7 +96,7 @@ where
 
 impl<Q, R, F> Everything<Q, R, F>
 where
-    Q: QueryAll<R>,
+    Q: QueryForAll<R>,
     F: FnMut(R, R) -> R,
 {
     /// Construct a new `Everything` query traversal.
@@ -109,9 +109,9 @@ where
     }
 }
 
-impl<Q, R, F> QueryAll<R> for Everything<Q, R, F>
+impl<Q, R, F> QueryForAll<R> for Everything<Q, R, F>
 where
-    Q: QueryAll<R>,
+    Q: QueryForAll<R>,
     F: FnMut(R, R) -> R,
 {
     fn query<T>(&mut self, t: &T) -> R

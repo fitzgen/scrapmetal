@@ -47,14 +47,14 @@ pub trait Term: Sized {
     /// children.
     fn map_one_transform<F>(self, f: &mut F) -> Self
     where
-        F: TransformAll;
+        F: TransformForAll;
 
     /// Perform one-layer traversal and immutable querying of this value's
     /// direct children, calling `each` on each of the query result for each
     /// direct child.
     fn map_one_query<Q, R, F>(&self, query: &mut Q, each: F)
     where
-        Q: QueryAll<R>,
+        Q: QueryForAll<R>,
         F: FnMut(&mut Q, R);
 
     /// Perform one-layer traversal and mutable querying of this value's direct
@@ -62,7 +62,7 @@ pub trait Term: Sized {
     /// child.
     fn map_one_mutation<M, R, F>(&mut self, mutation: &mut M, each: F)
     where
-        M: MutateAll<R>,
+        M: MutateForAll<R>,
         F: FnMut(&mut M, R);
 }
 

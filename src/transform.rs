@@ -4,8 +4,8 @@ use std::marker::PhantomData;
 /// Work around Rust's lack of higher-rank type polymorphism with a trait that
 /// has a generic `fn transform<T>` method. Essentially, we'd really prefer
 /// taking arguments of type `F: for<T> FnMut(T) -> T` rather than `F:
-/// TransformAll` but Rust doesn't support them yet (ever?).
-pub trait TransformAll {
+/// TransformForAll` but Rust doesn't support them yet (ever?).
+pub trait TransformForAll {
     /// Call the transform function on any `T`.
     fn transform<T>(&mut self, t: T) -> T
     where
@@ -39,7 +39,7 @@ where
     }
 }
 
-impl<F, U> TransformAll for Transformation<F, U>
+impl<F, U> TransformForAll for Transformation<F, U>
 where
     F: FnMut(U) -> U,
 {
@@ -62,14 +62,14 @@ where
 #[derive(Debug)]
 pub struct Everywhere<F>
 where
-    F: TransformAll,
+    F: TransformForAll,
 {
     f: F,
 }
 
 impl<F> Everywhere<F>
 where
-    F: TransformAll,
+    F: TransformForAll,
 {
     /// Construct a new transformation traversal.
     pub fn new(f: F) -> Everywhere<F> {
@@ -77,9 +77,9 @@ where
     }
 }
 
-impl<F> TransformAll for Everywhere<F>
+impl<F> TransformForAll for Everywhere<F>
 where
-    F: TransformAll,
+    F: TransformForAll,
 {
     fn transform<T>(&mut self, t: T) -> T
     where

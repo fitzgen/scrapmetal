@@ -76,14 +76,14 @@ impl cmp::Ord for Salary {
 impl Term for Company {
     fn map_one_transform<F>(self, f: &mut F) -> Self
     where
-        F: TransformAll,
+        F: TransformForAll,
     {
         Company(f.transform(self.0))
     }
 
     fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
     where
-        Q: QueryAll<R>,
+        Q: QueryForAll<R>,
         F: FnMut(&mut Q, R),
     {
         let r = q.query(&self.0);
@@ -92,7 +92,7 @@ impl Term for Company {
 
     fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
     where
-        M: MutateAll<R>,
+        M: MutateForAll<R>,
         F: FnMut(&mut M, R),
     {
         let r = m.mutate(&mut self.0);
@@ -103,7 +103,7 @@ impl Term for Company {
 impl Term for Department {
     fn map_one_transform<F>(self, f: &mut F) -> Self
     where
-        F: TransformAll,
+        F: TransformForAll,
     {
         let name = f.transform(self.0);
         let mgr = f.transform(self.1);
@@ -113,7 +113,7 @@ impl Term for Department {
 
     fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
     where
-        Q: QueryAll<R>,
+        Q: QueryForAll<R>,
         F: FnMut(&mut Q, R),
     {
         let r = q.query(&self.0);
@@ -126,7 +126,7 @@ impl Term for Department {
 
     fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
     where
-        M: MutateAll<R>,
+        M: MutateForAll<R>,
         F: FnMut(&mut M, R),
     {
         let r = m.mutate(&mut self.0);
@@ -141,7 +141,7 @@ impl Term for Department {
 impl Term for SubUnit {
     fn map_one_transform<F>(self, f: &mut F) -> Self
     where
-        F: TransformAll,
+        F: TransformForAll,
     {
         match self {
             SubUnit::Person(e) => SubUnit::Person(f.transform(e)),
@@ -151,7 +151,7 @@ impl Term for SubUnit {
 
     fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
     where
-        Q: QueryAll<R>,
+        Q: QueryForAll<R>,
         F: FnMut(&mut Q, R),
     {
         match *self {
@@ -168,7 +168,7 @@ impl Term for SubUnit {
 
     fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
     where
-        M: MutateAll<R>,
+        M: MutateForAll<R>,
         F: FnMut(&mut M, R),
     {
         match *self {
@@ -187,14 +187,14 @@ impl Term for SubUnit {
 impl Term for Employee {
     fn map_one_transform<F>(self, f: &mut F) -> Self
     where
-        F: TransformAll,
+        F: TransformForAll,
     {
         Employee(f.transform(self.0), f.transform(self.1))
     }
 
     fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
     where
-        Q: QueryAll<R>,
+        Q: QueryForAll<R>,
         F: FnMut(&mut Q, R),
     {
         let r = q.query(&self.0);
@@ -205,7 +205,7 @@ impl Term for Employee {
 
     fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
     where
-        M: MutateAll<R>,
+        M: MutateForAll<R>,
         F: FnMut(&mut M, R),
     {
         let r = m.mutate(&mut self.0);
@@ -218,14 +218,14 @@ impl Term for Employee {
 impl Term for Person {
     fn map_one_transform<F>(self, f: &mut F) -> Self
     where
-        F: TransformAll,
+        F: TransformForAll,
     {
         Person(f.transform(self.0), f.transform(self.1))
     }
 
     fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
     where
-        Q: QueryAll<R>,
+        Q: QueryForAll<R>,
         F: FnMut(&mut Q, R),
     {
         let r = q.query(&self.0);
@@ -236,7 +236,7 @@ impl Term for Person {
 
     fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
     where
-        M: MutateAll<R>,
+        M: MutateForAll<R>,
         F: FnMut(&mut M, R),
     {
         let r = m.mutate(&mut self.0);
@@ -249,14 +249,14 @@ impl Term for Person {
 impl Term for Salary {
     fn map_one_transform<F>(self, f: &mut F) -> Self
     where
-        F: TransformAll,
+        F: TransformForAll,
     {
         Salary(f.transform(self.0))
     }
 
     fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
     where
-        Q: QueryAll<R>,
+        Q: QueryForAll<R>,
         F: FnMut(&mut Q, R),
     {
         let r = q.query(&self.0);
@@ -265,7 +265,7 @@ impl Term for Salary {
 
     fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
     where
-        M: MutateAll<R>,
+        M: MutateForAll<R>,
         F: FnMut(&mut M, R),
     {
         let r = m.mutate(&mut self.0);
