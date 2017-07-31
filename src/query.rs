@@ -36,7 +36,7 @@ where
 }
 
 impl<Q, U, R> Query<Q, U, fn() -> R, R>
-    where
+where
     Q: FnMut(&U) -> R,
     R: Default,
 {
@@ -52,7 +52,7 @@ impl<Q, U, R> Query<Q, U, fn() -> R, R>
 }
 
 impl<Q, U, D, R> Query<Q, U, D, R>
-    where
+where
     Q: FnMut(&U) -> R,
     D: FnMut() -> R,
 {
@@ -60,7 +60,9 @@ impl<Q, U, D, R> Query<Q, U, D, R>
     /// we query a value whose type is not `U`.
     pub fn or_else(make_default: D, query: Q) -> Query<Q, U, D, R> {
         Query {
-            make_default, query, phantom: PhantomData,
+            make_default,
+            query,
+            phantom: PhantomData,
         }
     }
 }
@@ -105,7 +107,11 @@ where
 {
     /// Construct a new `Everything` query traversal.
     pub fn new(q: Q, fold: F) -> Everything<Q, R, F> {
-        Everything { q, fold, phantom: PhantomData }
+        Everything {
+            q,
+            fold,
+            phantom: PhantomData,
+        }
     }
 }
 
@@ -131,8 +137,7 @@ mod tests {
 
     #[test]
     fn querying() {
-        let mut char_to_u32 = Query::or_else(|| 42,
-                                             |c: &char| *c as u32);
+        let mut char_to_u32 = Query::or_else(|| 42, |c: &char| *c as u32);
         assert_eq!(char_to_u32.query(&'a'), 97);
         assert_eq!(char_to_u32.query(&'b'), 98);
         assert_eq!(char_to_u32.query(&vec![1, 2, 3]), 42);
