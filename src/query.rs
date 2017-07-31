@@ -38,6 +38,7 @@ where
 {
     /// Construct a new `Query`, returning `R::default()` for the cases where we
     /// query a value whose type is not `U`.
+    #[inline]
     pub fn new(query: Q) -> Query<Q, U, fn() -> R, R> {
         Query {
             make_default: Default::default,
@@ -54,6 +55,7 @@ where
 {
     /// Construct a new `Query`, returning `make_default()` for the cases where
     /// we query a value whose type is not `U`.
+    #[inline]
     pub fn or_else(make_default: D, query: Q) -> Query<Q, U, D, R> {
         Query {
             make_default,
@@ -68,6 +70,7 @@ where
     Q: FnMut(&U) -> R,
     D: FnMut() -> R,
 {
+    #[inline]
     fn query<T>(&mut self, t: &T) -> R
     where
         T: Term,
@@ -100,6 +103,7 @@ where
     F: FnMut(R, R) -> R,
 {
     /// Construct a new `Everything` query traversal.
+    #[inline]
     pub fn new(q: Q, fold: F) -> Everything<Q, R, F> {
         Everything {
             q,
@@ -114,6 +118,7 @@ where
     Q: QueryForAll<R>,
     F: FnMut(R, R) -> R,
 {
+    #[inline]
     fn query<T>(&mut self, t: &T) -> R
     where
         T: Term,

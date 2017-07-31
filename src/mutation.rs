@@ -37,6 +37,7 @@ where
 {
     /// Construct a new `Mutation`, returning `R::default()` for the cases where we
     /// query a value whose type is not `U`.
+    #[inline]
     pub fn new(mutation: M) -> Mutation<M, U, fn() -> R, R> {
         Mutation {
             make_default: Default::default,
@@ -53,6 +54,7 @@ where
 {
     /// Construct a new `Mutation`, returning `make_default()` for the cases where
     /// we query a value whose type is not `U`.
+    #[inline]
     pub fn or_else(make_default: D, mutation: M) -> Mutation<M, U, D, R> {
         Mutation {
             make_default,
@@ -67,6 +69,7 @@ where
     M: FnMut(&mut U) -> R,
     D: FnMut() -> R,
 {
+    #[inline]
     fn mutate<T>(&mut self, t: &mut T) -> R
     where
         T: Term,
@@ -99,6 +102,7 @@ where
     F: FnMut(R, R) -> R,
 {
     /// Construct a new `MutateEverything` query traversal.
+    #[inline]
     pub fn new(m: M, fold: F) -> MutateEverything<M, R, F> {
         MutateEverything {
             m,
@@ -113,6 +117,7 @@ where
     M: MutateForAll<R>,
     F: FnMut(R, R) -> R,
 {
+    #[inline]
     fn mutate<T>(&mut self, t: &mut T) -> R
     where
         T: Term,

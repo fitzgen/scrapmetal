@@ -3,6 +3,7 @@ use super::{MutateForAll, QueryForAll, Term, TransformForAll};
 macro_rules! impl_trivial_term {
     ( $name:ty ) => {
         impl Term for $name {
+            #[inline]
             fn map_one_transform<F>(self, _: &mut F) -> Self
             where
                 F: TransformForAll,
@@ -10,12 +11,14 @@ macro_rules! impl_trivial_term {
                 self
             }
 
+            #[inline]
             fn map_one_query<Q, R, F>(&self, _: &mut Q, _: F)
             where
                 Q: QueryForAll<R>,
                 F: FnMut(&mut Q, R),
             {}
 
+            #[inline]
             fn map_one_mutation<M, R, F>(&mut self, _: &mut M, _: F)
             where
                 M: MutateForAll<R>,
@@ -35,6 +38,7 @@ impl<T> Term for Vec<T>
 where
     T: Term,
 {
+    #[inline]
     fn map_one_transform<F>(mut self, f: &mut F) -> Vec<T>
     where
         F: TransformForAll,
@@ -42,6 +46,7 @@ where
         self.drain(..).map(|t| f.transform(t)).collect()
     }
 
+    #[inline]
     fn map_one_query<Q, R, F>(&self, query: &mut Q, mut each: F)
     where
         Q: QueryForAll<R>,
@@ -55,6 +60,7 @@ where
             .count();
     }
 
+    #[inline]
     fn map_one_mutation<M, R, F>(&mut self, mutation: &mut M, mut each: F)
     where
         M: MutateForAll<R>,
@@ -73,6 +79,7 @@ impl<T> Term for Box<T>
 where
     T: Sized + Term,
 {
+    #[inline]
     fn map_one_transform<F>(self, f: &mut F) -> Box<T>
     where
         F: TransformForAll,
@@ -80,6 +87,7 @@ where
         Box::new(f.transform(*self))
     }
 
+    #[inline]
     fn map_one_query<Q, R, F>(&self, query: &mut Q, mut each: F)
     where
         Q: QueryForAll<R>,
@@ -89,6 +97,7 @@ where
         each(query, r);
     }
 
+    #[inline]
     fn map_one_mutation<M, R, F>(&mut self, mutation: &mut M, mut each: F)
     where
         M: MutateForAll<R>,

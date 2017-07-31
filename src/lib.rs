@@ -29,6 +29,7 @@ trait Cast<T>: Sized {
 
 /// A default blanket implementation that says the value cannot be cast to `T`.
 impl<T, U> Cast<T> for U {
+    #[inline(always)]
     default fn cast(self) -> Result<T, Self> {
         Err(self)
     }
@@ -36,6 +37,7 @@ impl<T, U> Cast<T> for U {
 
 /// A specialization for when `Self=T` that allows the cast to succeed.
 impl<T> Cast<T> for T {
+    #[inline(always)]
     fn cast(self) -> Result<T, Self> {
         Ok(self)
     }

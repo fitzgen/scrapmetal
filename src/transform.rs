@@ -31,6 +31,7 @@ where
     F: FnMut(U) -> U,
 {
     /// Construct a new `Transformation` from the given function.
+    #[inline]
     pub fn new(f: F) -> Transformation<F, U> {
         Transformation {
             f,
@@ -43,6 +44,7 @@ impl<F, U> TransformForAll for Transformation<F, U>
 where
     F: FnMut(U) -> U,
 {
+    #[inline]
     fn transform<T>(&mut self, t: T) -> T {
         match Cast::<U>::cast(t) {
             Ok(u) => match Cast::<T>::cast((self.f)(u)) {
@@ -72,6 +74,7 @@ where
     F: TransformForAll,
 {
     /// Construct a new transformation traversal.
+    #[inline]
     pub fn new(f: F) -> Everywhere<F> {
         Everywhere { f }
     }
@@ -81,6 +84,7 @@ impl<F> TransformForAll for Everywhere<F>
 where
     F: TransformForAll,
 {
+    #[inline]
     fn transform<T>(&mut self, t: T) -> T
     where
         T: Term,
