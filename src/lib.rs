@@ -78,7 +78,7 @@ mod tests {
     #[derive(Clone, Debug, PartialEq)]
     struct Person(Name, Address);
 
-    #[derive(Clone, Debug, PartialEq)]
+    #[derive(Clone, Debug, Default, PartialEq)]
     struct Salary(f64);
 
     type Manager = Employee;
@@ -314,8 +314,8 @@ mod tests {
 
     #[test]
     fn query_highest_salary() {
-        let query = Query::new(None, |s: &Salary| Some(s.clone()));
-        let mut highest_salary = Everything::new(None, query, |a, b| match (a, b) {
+        let query = Query::new(|s: &Salary| Some(s.clone()));
+        let mut highest_salary = Everything::new(query, |a, b| match (a, b) {
             (Some(a), Some(b)) => if a.0 > b.0 {
                 Some(a)
             } else {

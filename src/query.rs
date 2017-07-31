@@ -1,9 +1,6 @@
 use super::{Cast, Term};
 use std::marker::PhantomData;
 
-// TODO: lighten up on `R: Clone` and allow a create-a-default function (which
-// can itself default to `|| some_defualt.clone()`).
-
 // TODO: Provide mutable querying.
 
 // TODO: Helper that does mutable querying for when R=()
@@ -28,36 +25,50 @@ pub trait QueryAll<R> {
 ///
 /// This essentially lifts a `FnMut(&U) -> R` into a `for<T> FnMut(&T) -> R`.
 #[derive(Debug)]
-pub struct Query<Q, U, R>
+pub struct Query<Q, U, D, R>
 where
     Q: FnMut(&U) -> R,
-    R: Clone,
+    D: FnMut() -> R,
 {
-    default: R,
+    make_default: D,
     query: Q,
-    phantom: PhantomData<fn(U) -> R>,
+    phantom: PhantomData<fn(&U) -> R>,
 }
 
-impl<Q, U, R> Query<Q, U, R>
-where
+impl<Q, U, R> Query<Q, U, fn() -> R, R>
+    where
     Q: FnMut(&U) -> R,
-    R: Clone,
+    R: Default,
 {
-    /// Construct a new `Query`, with a default `R` value for when it is
-    /// querying non-`U` values.
-    pub fn new(default: R, query: Q) -> Query<Q, U, R> {
+    /// Construct a new `Query`, returning `R::default()` for the cases where we
+    /// query a value whose type is not `U`.
+    pub fn new(query: Q) -> Query<Q, U, fn() -> R, R> {
         Query {
-            default,
+            make_default: Default::default,
             query,
             phantom: PhantomData,
         }
     }
 }
 
-impl<Q, U, R> QueryAll<R> for Query<Q, U, R>
+impl<Q, U, D, R> Query<Q, U, D, R>
+    where
+    Q: FnMut(&U) -> R,
+    D: FnMut() -> R,
+{
+    /// Construct a new `Query`, returning `make_default()` for the cases where
+    /// we query a value whose type is not `U`.
+    pub fn or_else(make_default: D, query: Q) -> Query<Q, U, D, R> {
+        Query {
+            make_default, query, phantom: PhantomData,
+        }
+    }
+}
+
+impl<Q, U, D, R> QueryAll<R> for Query<Q, U, D, R>
 where
     Q: FnMut(&U) -> R,
-    R: Clone,
+    D: FnMut() -> R,
 {
     fn query<T>(&mut self, t: &T) -> R
     where
@@ -65,7 +76,7 @@ where
     {
         match Cast::<&U>::cast(t) {
             Ok(u) => (self.query)(u),
-            Err(_) => self.default.clone(),
+            Err(_) => (self.make_default)(),
         }
     }
 }
@@ -81,9 +92,9 @@ where
     F: FnMut(R, R) -> R,
     R: Clone,
 {
-    q: Q,p
-    default: R,
+    q: Q,
     fold: F,
+    phantom: PhantomData<fn(R, R) -> R>,
 }
 
 impl<Q, R, F> Everything<Q, R, F>
@@ -93,8 +104,8 @@ where
     R: Clone,
 {
     /// Construct a new `Everything` query traversal.
-    pub fn new(default: R, q: Q, fold: F) -> Everything<Q, R, F> {
-        Everything { q, default, fold }
+    pub fn new(q: Q, fold: F) -> Everything<Q, R, F> {
+        Everything { q, fold, phantom: PhantomData }
     }
 }
 
@@ -120,7 +131,8 @@ mod tests {
 
     #[test]
     fn querying() {
-        let mut char_to_u32 = Query::new(42, |c: &char| *c as u32);
+        let mut char_to_u32 = Query::or_else(|| 42,
+                                             |c: &char| *c as u32);
         assert_eq!(char_to_u32.query(&'a'), 97);
         assert_eq!(char_to_u32.query(&'b'), 98);
         assert_eq!(char_to_u32.query(&vec![1, 2, 3]), 42);
