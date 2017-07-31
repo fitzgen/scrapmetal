@@ -2,7 +2,7 @@
 //!
 //! This crate provides the traversing, transforming, and querying helpers and
 //! combinators from the Haskell paper "Scrap Your Boilerplate" by Lämmel and
-//! Jones to Rust.
+//! Peyton Jones to Rust.
 //!
 #![feature(specialization)]
 #![deny(missing_docs)]
