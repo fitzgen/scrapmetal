@@ -492,7 +492,7 @@ fn increase_in_place_with_boilerplate() {
 #[test]
 fn increase_in_place_scrapping_boilerplate() {
     let mutation = Mutation::new(|s: &mut Salary| s.0 += 1.0);
-    let mut increase_in_place = MutateEverything::new(mutation, |_, _| ());
+    let mut increase_in_place = MutateEverything::new(mutation);
 
     let mut company = Company::default();
     increase_in_place.mutate(&mut company);

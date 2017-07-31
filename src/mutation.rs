@@ -103,7 +103,24 @@ where
 {
     /// Construct a new `MutateEverything` query traversal.
     #[inline]
-    pub fn new(m: M, fold: F) -> MutateEverything<M, R, F> {
+    pub fn with_query(m: M, fold: F) -> MutateEverything<M, R, F> {
+        MutateEverything {
+            m,
+            fold,
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl<M> MutateEverything<M, (), fn((), ())>
+where
+    M: MutateForAll<()>,
+{
+    /// Construct a new `MutateEverything` query traversal.
+    #[inline]
+    pub fn new(m: M) -> MutateEverything<M, (), fn((), ())> {
+        #[inline(always)]
+        fn fold(_: (), _: ()) {}
         MutateEverything {
             m,
             fold,

@@ -1,8 +1,6 @@
 use super::{Cast, Term};
 use std::marker::PhantomData;
 
-// TODO: Helper that does mutable querying for when R=()
-
 // TODO: subtree filtering
 
 /// A similar work around as `TransformForAll`, but returning a query type, rather

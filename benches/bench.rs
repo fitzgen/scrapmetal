@@ -33,7 +33,7 @@ fn bench_increase_in_place_with_boilerplate(b: &mut test::Bencher) {
 #[bench]
 fn bench_increase_in_place_scrapping_boilerplate(b: &mut test::Bencher) {
     let mutation = Mutation::new(|s: &mut Salary| s.0 += 1.0);
-    let mut increase_in_place = MutateEverything::new(mutation, |_, _| ());
+    let mut increase_in_place = MutateEverything::new(mutation);
 
     let mut company = Company::default();
     b.iter(|| {
