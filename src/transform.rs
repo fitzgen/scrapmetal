@@ -1,4 +1,4 @@
-use super::{Cast, Term};
+use super::{Cast, PredicateForAll, Term};
 use std::marker::PhantomData;
 
 /// Work around Rust's lack of higher-rank type polymorphism with a trait that
@@ -91,6 +91,49 @@ where
     {
         let t = t.map_one_transform(self);
         self.f.transform(t)
+    }
+}
+
+/// Recursively perform a transformation in a bottom up manner across a complete
+/// data structure.
+#[derive(Debug)]
+pub struct EverywhereBut<F, P>
+where
+    F: TransformForAll,
+    P: PredicateForAll,
+{
+    p: P,
+    f: F,
+}
+
+impl<F, P> EverywhereBut<F, P>
+where
+    F: TransformForAll,
+    P: PredicateForAll,
+{
+    /// Construct a new transformation traversal.
+    #[inline]
+    pub fn new(p: P, f: F) -> EverywhereBut<F, P> {
+        EverywhereBut { p, f }
+    }
+}
+
+impl<F, P> TransformForAll for EverywhereBut<F, P>
+where
+    F: TransformForAll,
+    P: PredicateForAll,
+{
+    #[inline]
+    fn transform<T>(&mut self, t: T) -> T
+    where
+        T: Term,
+    {
+        if self.p.predicate(&t) {
+            let t = t.map_one_transform(self);
+            self.f.transform(t)
+        } else {
+            t
+        }
     }
 }
 

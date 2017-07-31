@@ -1,8 +1,6 @@
 use super::{Cast, Term};
 use std::marker::PhantomData;
 
-// TODO: subtree filtering
-
 /// A similar work around as `TransformForAll`, but returning a query type, rather
 /// than the same type. This is roughly equivalent to `for<T> FnMut(&T) -> R`.
 pub trait QueryForAll<R> {
