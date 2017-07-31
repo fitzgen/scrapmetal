@@ -1,20 +1,26 @@
-use super::{QueryAll, Term, TransformAll};
+use super::{MutateAll, QueryAll, Term, TransformAll};
 
 macro_rules! impl_trivial_term {
     ( $name:ty ) => {
         impl Term for $name {
             fn map_one_transform<F>(self, _: &mut F) -> Self
-              where
+            where
                 F: TransformAll,
             {
                 self
             }
 
-            fn map_one_query<F, R>(&self, _: &mut F) -> Vec<R>
-                where F: QueryAll<R>
-            {
-                vec![]
-            }
+            fn map_one_query<Q, R, F>(&self, _: &mut Q, _: F)
+            where
+                Q: QueryAll<R>,
+                F: FnMut(&mut Q, R),
+            {}
+
+            fn map_one_mutation<M, R, F>(&mut self, _: &mut M, _: F)
+            where
+                M: MutateAll<R>,
+                F: FnMut(&mut M, R),
+            {}
         }
     }
 }
@@ -36,11 +42,30 @@ where
         self.drain(..).map(|t| f.transform(t)).collect()
     }
 
-    fn map_one_query<F, R>(&self, q: &mut F) -> Vec<R>
+    fn map_one_query<Q, R, F>(&self, query: &mut Q, mut each: F)
     where
-        F: QueryAll<R>,
+        Q: QueryAll<R>,
+        F: FnMut(&mut Q, R),
     {
-        self.iter().map(|t| q.query(t)).collect()
+        self.iter()
+            .map(|t| {
+                let r = query.query(t);
+                each(query, r);
+            })
+            .count();
+    }
+
+    fn map_one_mutation<M, R, F>(&mut self, mutation: &mut M, mut each: F)
+    where
+        M: MutateAll<R>,
+        F: FnMut(&mut M, R),
+    {
+        self.iter_mut()
+            .map(|t| {
+                let r = mutation.mutate(t);
+                each(mutation, r);
+            })
+            .count();
     }
 }
 
@@ -55,10 +80,21 @@ where
         Box::new(f.transform(*self))
     }
 
-    fn map_one_query<F, R>(&self, q: &mut F) -> Vec<R>
+    fn map_one_query<Q, R, F>(&self, query: &mut Q, mut each: F)
     where
-        F: QueryAll<R>,
+        Q: QueryAll<R>,
+        F: FnMut(&mut Q, R),
     {
-        vec![q.query(&**self)]
+        let r = query.query(&**self);
+        each(query, r);
+    }
+
+    fn map_one_mutation<M, R, F>(&mut self, mutation: &mut M, mut each: F)
+    where
+        M: MutateAll<R>,
+        F: FnMut(&mut M, R),
+    {
+        let r = mutation.mutate(&mut **self);
+        each(mutation, r);
     }
 }

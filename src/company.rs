@@ -81,11 +81,22 @@ impl Term for Company {
         Company(f.transform(self.0))
     }
 
-    fn map_one_query<Q, R>(&self, q: &mut Q) -> Vec<R>
+    fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
     where
         Q: QueryAll<R>,
+        F: FnMut(&mut Q, R),
     {
-        vec![q.query(&self.0)]
+        let r = q.query(&self.0);
+        f(q, r);
+    }
+
+    fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
+    where
+        M: MutateAll<R>,
+        F: FnMut(&mut M, R),
+    {
+        let r = m.mutate(&mut self.0);
+        f(m, r);
     }
 }
 
@@ -100,11 +111,30 @@ impl Term for Department {
         Department(name, mgr, units)
     }
 
-    fn map_one_query<Q, R>(&self, q: &mut Q) -> Vec<R>
+    fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
     where
         Q: QueryAll<R>,
+        F: FnMut(&mut Q, R),
     {
-        vec![q.query(&self.0), q.query(&self.1), q.query(&self.2)]
+        let r = q.query(&self.0);
+        f(q, r);
+        let r = q.query(&self.1);
+        f(q, r);
+        let r = q.query(&self.2);
+        f(q, r);
+    }
+
+    fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
+    where
+        M: MutateAll<R>,
+        F: FnMut(&mut M, R),
+    {
+        let r = m.mutate(&mut self.0);
+        f(m, r);
+        let r = m.mutate(&mut self.1);
+        f(m, r);
+        let r = m.mutate(&mut self.2);
+        f(m, r);
     }
 }
 
@@ -119,13 +149,37 @@ impl Term for SubUnit {
         }
     }
 
-    fn map_one_query<Q, R>(&self, q: &mut Q) -> Vec<R>
+    fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
     where
         Q: QueryAll<R>,
+        F: FnMut(&mut Q, R),
     {
         match *self {
-            SubUnit::Person(ref e) => vec![q.query(e)],
-            SubUnit::Department(ref d) => vec![q.query(d)],
+            SubUnit::Person(ref e) => {
+                let r = q.query(e);
+                f(q, r);
+            }
+            SubUnit::Department(ref d) => {
+                let r = q.query(d);
+                f(q, r);
+            }
+        }
+    }
+
+    fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
+    where
+        M: MutateAll<R>,
+        F: FnMut(&mut M, R),
+    {
+        match *self {
+            SubUnit::Person(ref mut e) => {
+                let r = m.mutate(e);
+                f(m, r);
+            }
+            SubUnit::Department(ref mut d) => {
+                let r = m.mutate(d);
+                f(m, r);
+            }
         }
     }
 }
@@ -138,11 +192,26 @@ impl Term for Employee {
         Employee(f.transform(self.0), f.transform(self.1))
     }
 
-    fn map_one_query<Q, R>(&self, q: &mut Q) -> Vec<R>
+    fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
     where
         Q: QueryAll<R>,
+        F: FnMut(&mut Q, R),
     {
-        vec![q.query(&self.0), q.query(&self.1)]
+        let r = q.query(&self.0);
+        f(q, r);
+        let r = q.query(&self.1);
+        f(q, r);
+    }
+
+    fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
+    where
+        M: MutateAll<R>,
+        F: FnMut(&mut M, R),
+    {
+        let r = m.mutate(&mut self.0);
+        f(m, r);
+        let r = m.mutate(&mut self.1);
+        f(m, r);
     }
 }
 
@@ -154,11 +223,26 @@ impl Term for Person {
         Person(f.transform(self.0), f.transform(self.1))
     }
 
-    fn map_one_query<Q, R>(&self, q: &mut Q) -> Vec<R>
+    fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
     where
         Q: QueryAll<R>,
+        F: FnMut(&mut Q, R),
     {
-        vec![q.query(&self.0), q.query(&self.1)]
+        let r = q.query(&self.0);
+        f(q, r);
+        let r = q.query(&self.1);
+        f(q, r);
+    }
+
+    fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
+    where
+        M: MutateAll<R>,
+        F: FnMut(&mut M, R),
+    {
+        let r = m.mutate(&mut self.0);
+        f(m, r);
+        let r = m.mutate(&mut self.1);
+        f(m, r);
     }
 }
 
@@ -170,11 +254,22 @@ impl Term for Salary {
         Salary(f.transform(self.0))
     }
 
-    fn map_one_query<Q, R>(&self, q: &mut Q) -> Vec<R>
+    fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
     where
         Q: QueryAll<R>,
+        F: FnMut(&mut Q, R),
     {
-        vec![q.query(&self.0)]
+        let r = q.query(&self.0);
+        f(q, r);
+    }
+
+    fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
+    where
+        M: MutateAll<R>,
+        F: FnMut(&mut M, R),
+    {
+        let r = m.mutate(&mut self.0);
+        f(m, r);
     }
 }
 
@@ -218,6 +313,46 @@ impl Increase for Employee {
 impl Increase for Salary {
     fn increase(self, k: f64) -> Salary {
         Salary(self.0 + k)
+    }
+}
+
+// Boilerplate version of `increase_in_place` //////////////////////////////////
+
+pub trait IncreaseInPlace {
+    fn increase_in_place(&mut self, k: f64);
+}
+
+impl IncreaseInPlace for Company {
+    fn increase_in_place(&mut self, k: f64) {
+        self.0.iter_mut().map(|d| d.increase_in_place(k)).count();
+    }
+}
+
+impl IncreaseInPlace for Department {
+    fn increase_in_place(&mut self, k: f64) {
+        self.1.increase_in_place(k);
+        self.2.iter_mut().map(|s| s.increase_in_place(k)).count();
+    }
+}
+
+impl IncreaseInPlace for SubUnit {
+    fn increase_in_place(&mut self, k: f64) {
+        match *self {
+            SubUnit::Person(ref mut e) => e.increase_in_place(k),
+            SubUnit::Department(ref mut d) => d.increase_in_place(k),
+        }
+    }
+}
+
+impl IncreaseInPlace for Employee {
+    fn increase_in_place(&mut self, k: f64) {
+        self.1.increase_in_place(k);
+    }
+}
+
+impl IncreaseInPlace for Salary {
+    fn increase_in_place(&mut self, k: f64) {
+        self.0 += k;
     }
 }
 
@@ -300,6 +435,67 @@ fn increase_scrapping_boilerplate() {
 
     let company = Company::default();
     let company = increase.transform(company);
+    assert_eq!(
+        company,
+        Company(vec![
+            Department(
+                "Research",
+                Employee(Person("Ralf", "Amsterdam"), Salary(8001.0)),
+                vec![
+                    SubUnit::Person(Employee(Person("Joost", "Amsterdam"), Salary(1001.0))),
+                    SubUnit::Person(Employee(Person("Marlow", "Cambridge"), Salary(2001.0))),
+                    SubUnit::Department(Box::new(Department(
+                        "Funsies",
+                        Employee(Person("Jim", "Portland"), Salary(4.0)),
+                        vec![],
+                    ))),
+                ],
+            ),
+            Department(
+                "Strategy",
+                Employee(Person("Blair", "London"), Salary(100001.0)),
+                vec![],
+            ),
+        ])
+    );
+}
+
+#[test]
+fn increase_in_place_with_boilerplate() {
+    let mut company = Company::default();
+    company.increase_in_place(1.0);
+    assert_eq!(
+        company,
+        Company(vec![
+            Department(
+                "Research",
+                Employee(Person("Ralf", "Amsterdam"), Salary(8001.0)),
+                vec![
+                    SubUnit::Person(Employee(Person("Joost", "Amsterdam"), Salary(1001.0))),
+                    SubUnit::Person(Employee(Person("Marlow", "Cambridge"), Salary(2001.0))),
+                    SubUnit::Department(Box::new(Department(
+                        "Funsies",
+                        Employee(Person("Jim", "Portland"), Salary(4.0)),
+                        vec![],
+                    ))),
+                ],
+            ),
+            Department(
+                "Strategy",
+                Employee(Person("Blair", "London"), Salary(100001.0)),
+                vec![],
+            ),
+        ])
+    );
+}
+
+#[test]
+fn increase_in_place_scrapping_boilerplate() {
+    let mutation = Mutation::new(|s: &mut Salary| s.0 += 1.0);
+    let mut increase_in_place = MutateEverything::new(mutation, |_, _| ());
+
+    let mut company = Company::default();
+    increase_in_place.mutate(&mut company);
     assert_eq!(
         company,
         Company(vec![

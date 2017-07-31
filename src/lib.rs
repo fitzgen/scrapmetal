@@ -11,9 +11,12 @@
 #[cfg(any(test, feature = "bench"))]
 pub mod company;
 
+mod mutation;
 mod query;
 mod term_impls;
 mod transform;
+
+pub use mutation::*;
 
 pub use query::*;
 
@@ -46,11 +49,21 @@ pub trait Term: Sized {
     where
         F: TransformAll;
 
-    /// Perform one-layer traversal and querying of this value's direct
-    /// children.
-    fn map_one_query<F, R>(&self, f: &mut F) -> Vec<R>
+    /// Perform one-layer traversal and immutable querying of this value's
+    /// direct children, calling `each` on each of the query result for each
+    /// direct child.
+    fn map_one_query<Q, R, F>(&self, query: &mut Q, each: F)
     where
-        F: QueryAll<R>;
+        Q: QueryAll<R>,
+        F: FnMut(&mut Q, R);
+
+    /// Perform one-layer traversal and mutable querying of this value's direct
+    /// children, calling `each` on each of the query result for each direct
+    /// child.
+    fn map_one_mutation<M, R, F>(&mut self, mutation: &mut M, each: F)
+    where
+        M: MutateAll<R>,
+        F: FnMut(&mut M, R);
 }
 
 #[cfg(test)]

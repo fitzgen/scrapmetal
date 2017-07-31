@@ -1,11 +1,9 @@
 use super::{Cast, Term};
 use std::marker::PhantomData;
 
-// TODO: Provide mutable querying.
-
 // TODO: Helper that does mutable querying for when R=()
 
-// TODO: Don't return `Vec<R>`, call a callback instead.
+// TODO: subtree filtering
 
 /// A similar work around as `TransformAll`, but returning a query type, rather
 /// than the same type. This is roughly equivalent to `for<T> FnMut(&T) -> R`.
@@ -90,7 +88,6 @@ pub struct Everything<Q, R, F>
 where
     Q: QueryAll<R>,
     F: FnMut(R, R) -> R,
-    R: Clone,
 {
     q: Q,
     fold: F,
@@ -101,7 +98,6 @@ impl<Q, R, F> Everything<Q, R, F>
 where
     Q: QueryAll<R>,
     F: FnMut(R, R) -> R,
-    R: Clone,
 {
     /// Construct a new `Everything` query traversal.
     pub fn new(q: Q, fold: F) -> Everything<Q, R, F> {
@@ -117,15 +113,17 @@ impl<Q, R, F> QueryAll<R> for Everything<Q, R, F>
 where
     Q: QueryAll<R>,
     F: FnMut(R, R) -> R,
-    R: Clone,
 {
     fn query<T>(&mut self, t: &T) -> R
     where
         T: Term,
     {
-        let r = self.q.query(t);
-        let rs = t.map_one_query(self);
-        rs.into_iter().fold(r, &mut self.fold)
+        let mut r = Some(self.q.query(t));
+        t.map_one_query(
+            self,
+            |me, rr| { r = Some((me.fold)(r.take().unwrap(), rr)); },
+        );
+        r.unwrap()
     }
 }
 
