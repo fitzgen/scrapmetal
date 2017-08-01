@@ -1,8 +1,8 @@
 //! Scrap Your Boilerplate!
 //!
 //! This crate provides the traversing, transforming, and querying helpers and
-//! combinators from the Haskell paper "Scrap Your Boilerplate" by Lämmel and
-//! Peyton Jones to Rust.
+//! combinators from the Haskell paper "Scrap Your Boilerplate: A Practical
+//! Design Pattern for Generic Programming" by Lämmel and Peyton Jones to Rust.
 //!
 #![feature(specialization)]
 #![deny(missing_docs)]
