@@ -1,11 +1,7 @@
 #![feature(test)]
+include!(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/company.rs"));
 
-extern crate scrapmetal;
 extern crate test;
-
-use scrapmetal::*;
-use scrapmetal::company::*;
-use std::cmp;
 
 #[bench]
 fn bench_increase_with_boilerplate(b: &mut test::Bencher) {

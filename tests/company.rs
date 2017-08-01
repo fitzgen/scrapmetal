@@ -1,29 +1,32 @@
-//! Some toy types to test and bench with, taken from the paper.
+extern crate scrapmetal;
 
-#![allow(missing_docs)]
+#[macro_use]
+extern crate scrapmetal_derive;
 
-use super::*;
+use scrapmetal::*;
 use std::cmp;
 
-#[derive(Clone, Debug, PartialEq)]
+// Some toy types to test and bench with, taken from the paper.
+
+#[derive(Clone, Debug, PartialEq, Term)]
 pub struct Company(pub Vec<Department>);
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Term)]
 pub struct Department(pub Name, pub Manager, pub Vec<SubUnit>);
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Term)]
 pub enum SubUnit {
     Person(Employee),
     Department(Box<Department>),
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Term)]
 pub struct Employee(pub Person, pub Salary);
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Term)]
 pub struct Person(pub Name, pub Address);
 
-#[derive(Clone, Debug, Default, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Default, PartialEq, PartialOrd, Term)]
 pub struct Salary(pub f64);
 
 pub type Manager = Employee;
@@ -66,210 +69,6 @@ impl cmp::Ord for Salary {
         } else {
             cmp::Ordering::Equal
         }
-    }
-}
-
-// Term impls //////////////////////////////////////////////////////////////////
-
-// TODO: derive these.
-
-impl Term for Company {
-    fn map_one_transform<F>(self, f: &mut F) -> Self
-    where
-        F: TransformForAll,
-    {
-        Company(f.transform(self.0))
-    }
-
-    fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
-    where
-        Q: QueryForAll<R>,
-        F: FnMut(&mut Q, R),
-    {
-        let r = q.query(&self.0);
-        f(q, r);
-    }
-
-    fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
-    where
-        M: MutateForAll<R>,
-        F: FnMut(&mut M, R),
-    {
-        let r = m.mutate(&mut self.0);
-        f(m, r);
-    }
-}
-
-impl Term for Department {
-    fn map_one_transform<F>(self, f: &mut F) -> Self
-    where
-        F: TransformForAll,
-    {
-        let name = f.transform(self.0);
-        let mgr = f.transform(self.1);
-        let units = f.transform(self.2);
-        Department(name, mgr, units)
-    }
-
-    fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
-    where
-        Q: QueryForAll<R>,
-        F: FnMut(&mut Q, R),
-    {
-        let r = q.query(&self.0);
-        f(q, r);
-        let r = q.query(&self.1);
-        f(q, r);
-        let r = q.query(&self.2);
-        f(q, r);
-    }
-
-    fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
-    where
-        M: MutateForAll<R>,
-        F: FnMut(&mut M, R),
-    {
-        let r = m.mutate(&mut self.0);
-        f(m, r);
-        let r = m.mutate(&mut self.1);
-        f(m, r);
-        let r = m.mutate(&mut self.2);
-        f(m, r);
-    }
-}
-
-impl Term for SubUnit {
-    fn map_one_transform<F>(self, f: &mut F) -> Self
-    where
-        F: TransformForAll,
-    {
-        match self {
-            SubUnit::Person(e) => SubUnit::Person(f.transform(e)),
-            SubUnit::Department(d) => SubUnit::Department(f.transform(d)),
-        }
-    }
-
-    fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
-    where
-        Q: QueryForAll<R>,
-        F: FnMut(&mut Q, R),
-    {
-        match *self {
-            SubUnit::Person(ref e) => {
-                let r = q.query(e);
-                f(q, r);
-            }
-            SubUnit::Department(ref d) => {
-                let r = q.query(d);
-                f(q, r);
-            }
-        }
-    }
-
-    fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
-    where
-        M: MutateForAll<R>,
-        F: FnMut(&mut M, R),
-    {
-        match *self {
-            SubUnit::Person(ref mut e) => {
-                let r = m.mutate(e);
-                f(m, r);
-            }
-            SubUnit::Department(ref mut d) => {
-                let r = m.mutate(d);
-                f(m, r);
-            }
-        }
-    }
-}
-
-impl Term for Employee {
-    fn map_one_transform<F>(self, f: &mut F) -> Self
-    where
-        F: TransformForAll,
-    {
-        Employee(f.transform(self.0), f.transform(self.1))
-    }
-
-    fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
-    where
-        Q: QueryForAll<R>,
-        F: FnMut(&mut Q, R),
-    {
-        let r = q.query(&self.0);
-        f(q, r);
-        let r = q.query(&self.1);
-        f(q, r);
-    }
-
-    fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
-    where
-        M: MutateForAll<R>,
-        F: FnMut(&mut M, R),
-    {
-        let r = m.mutate(&mut self.0);
-        f(m, r);
-        let r = m.mutate(&mut self.1);
-        f(m, r);
-    }
-}
-
-impl Term for Person {
-    fn map_one_transform<F>(self, f: &mut F) -> Self
-    where
-        F: TransformForAll,
-    {
-        Person(f.transform(self.0), f.transform(self.1))
-    }
-
-    fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
-    where
-        Q: QueryForAll<R>,
-        F: FnMut(&mut Q, R),
-    {
-        let r = q.query(&self.0);
-        f(q, r);
-        let r = q.query(&self.1);
-        f(q, r);
-    }
-
-    fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
-    where
-        M: MutateForAll<R>,
-        F: FnMut(&mut M, R),
-    {
-        let r = m.mutate(&mut self.0);
-        f(m, r);
-        let r = m.mutate(&mut self.1);
-        f(m, r);
-    }
-}
-
-impl Term for Salary {
-    fn map_one_transform<F>(self, f: &mut F) -> Self
-    where
-        F: TransformForAll,
-    {
-        Salary(f.transform(self.0))
-    }
-
-    fn map_one_query<Q, R, F>(&self, q: &mut Q, mut f: F)
-    where
-        Q: QueryForAll<R>,
-        F: FnMut(&mut Q, R),
-    {
-        let r = q.query(&self.0);
-        f(q, r);
-    }
-
-    fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut f: F)
-    where
-        M: MutateForAll<R>,
-        F: FnMut(&mut M, R),
-    {
-        let r = m.mutate(&mut self.0);
-        f(m, r);
     }
 }
 

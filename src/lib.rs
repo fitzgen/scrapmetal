@@ -8,9 +8,6 @@
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 
-#[cfg(any(test, feature = "bench"))]
-pub mod company;
-
 mod mutation;
 mod query;
 mod term_impls;
