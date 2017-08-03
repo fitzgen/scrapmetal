@@ -44,6 +44,69 @@ impl_trivial_term!(i16);
 impl_trivial_term!(i32);
 impl_trivial_term!(i64);
 
+macro_rules! impl_tuple_term {
+    ( $name:ident $( , $names:ident )* ) => {
+        impl<$name $( , $names )* > Term for ($name $( , $names )* )
+        where
+            $name: Term $(, $names : Term )*
+        {
+            #[inline]
+            #[allow(non_snake_case)]
+            fn map_one_transform<FF>(self, f: &mut FF) -> Self
+            where
+                FF: GenericTransform,
+            {
+                let ( $name $( , $names )* ) = self;
+                ( f.transform( $name ) $( , f.transform( $names ) )* )
+            }
+
+            #[inline]
+            #[allow(non_snake_case)]
+            fn map_one_query<Q, R, FF>(&self, q: &mut Q, mut each: FF)
+            where
+                Q: GenericQuery<R>,
+                FF: FnMut(&mut Q, R),
+            {
+                let ( ref $name $( , ref $names )* ) = *self;
+                let r = q.query( $name );
+                each(q, r);
+                $(
+                    let r = q.query( $names );
+                    each(q, r);
+                )*
+            }
+
+            #[inline]
+            #[allow(non_snake_case)]
+            fn map_one_mutation<M, R, FF>(&mut self, m: &mut M, mut each: FF)
+                where
+                M: GenericMutate<R>,
+                FF: FnMut(&mut M, R),
+            {
+                let ( ref mut $name $( , ref mut $names )* ) = *self;
+                let r = m.mutate( $name );
+                each(m, r);
+                $(
+                    let r = m.mutate( $names );
+                    each(m, r);
+                )*
+            }
+        }
+    }
+}
+
+impl_tuple_term!(A, B);
+impl_tuple_term!(A, B, C);
+impl_tuple_term!(A, B, C, D);
+impl_tuple_term!(A, B, C, D, E);
+impl_tuple_term!(A, B, C, D, E, F);
+impl_tuple_term!(A, B, C, D, E, F, G);
+impl_tuple_term!(A, B, C, D, E, F, G, H);
+impl_tuple_term!(A, B, C, D, E, F, G, H, I);
+impl_tuple_term!(A, B, C, D, E, F, G, H, I, J);
+impl_tuple_term!(A, B, C, D, E, F, G, H, I, J, K);
+impl_tuple_term!(A, B, C, D, E, F, G, H, I, J, K, L);
+
 impl<T> Term for Vec<T>
 where
     T: Term,
