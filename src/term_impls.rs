@@ -28,6 +28,7 @@ macro_rules! impl_trivial_term {
     }
 }
 
+impl_trivial_term!(());
 impl_trivial_term!(&'static str);
 impl_trivial_term!(bool);
 impl_trivial_term!(char);
