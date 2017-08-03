@@ -1,4 +1,4 @@
-use super::{Cast, PredicateForAll, Term};
+use super::{Cast, QueryForAll, Term};
 use std::marker::PhantomData;
 
 /// Work around Rust's lack of higher-rank type polymorphism with a trait that
@@ -100,7 +100,7 @@ where
 pub struct EverywhereBut<F, P>
 where
     F: TransformForAll,
-    P: PredicateForAll,
+    P: QueryForAll<bool>,
 {
     p: P,
     f: F,
@@ -109,7 +109,7 @@ where
 impl<F, P> EverywhereBut<F, P>
 where
     F: TransformForAll,
-    P: PredicateForAll,
+    P: QueryForAll<bool>,
 {
     /// Construct a new transformation traversal.
     #[inline]
@@ -121,14 +121,14 @@ where
 impl<F, P> TransformForAll for EverywhereBut<F, P>
 where
     F: TransformForAll,
-    P: PredicateForAll,
+    P: QueryForAll<bool>,
 {
     #[inline]
     fn transform<T>(&mut self, t: T) -> T
     where
         T: Term,
     {
-        if self.p.predicate(&t) {
+        if self.p.query(&t) {
             let t = t.map_one_transform(self);
             self.f.transform(t)
         } else {

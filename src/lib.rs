@@ -65,15 +65,6 @@ pub trait Term: Sized {
         F: FnMut(&mut M, R);
 }
 
-/// A function that can return a boolean for values of any given type. Used as a
-/// predicate for determining which subtrees to follow in various traversals.
-///
-/// Essentially `for<T> FnMut(&T) -> bool`.
-pub trait PredicateForAll {
-    /// Call the predicate function on the given value.
-    fn predicate<T>(&mut self, t: &T) -> bool;
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
