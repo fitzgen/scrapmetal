@@ -1,3 +1,4 @@
 /target/
+/scrapmetal-derive/target/
 **/*.rs.bk
 Cargo.lock
