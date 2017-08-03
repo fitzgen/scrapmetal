@@ -1,6 +1,6 @@
 # `scrapmetal`: Scrap Your Rust Boilerplate
 
-[![Build Status](https://travis-ci.org/fitzgen/scrapmetal.png?branch=master)](https://travis-ci.org/fitzgen/scrapmetal) [![scrapmetal on crates.io][https://img.shields.io/crates/v/scrapmetal.svg]](https://crates.io/crates/scrapmetal)
+[![Build Status](https://travis-ci.org/fitzgen/scrapmetal.png?branch=master)](https://travis-ci.org/fitzgen/scrapmetal) [![scrapmetal on crates.io](https://img.shields.io/crates/v/scrapmetal.svg)](https://crates.io/crates/scrapmetal)
 
 Generic transformations, queries, and mutations for Rust without the
 boilerplate.
