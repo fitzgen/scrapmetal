@@ -1,12 +1,12 @@
 use super::{Cast, Term};
 use std::marker::PhantomData;
 
-/// A similar work around as `TransformForAll`, but mutating in place and
+/// A similar work around as `GenericTransform`, but mutating in place and
 /// optionally returning some query type, rather than taking `self` and
 /// returning the same `Self` type.
 ///
 /// This is roughly equivalent to `for<T> FnMut(&mut T) -> R`.
-pub trait MutateForAll<R> {
+pub trait GenericMutate<R> {
     /// Call the query function on any `T`.
     fn mutate<T>(&mut self, t: &mut T) -> R
     where
@@ -64,7 +64,7 @@ where
     }
 }
 
-impl<M, U, D, R> MutateForAll<R> for Mutation<M, U, D, R>
+impl<M, U, D, R> GenericMutate<R> for Mutation<M, U, D, R>
 where
     M: FnMut(&mut U) -> R,
     D: FnMut() -> R,
@@ -82,13 +82,13 @@ where
 }
 
 /// Recursively perform a query in a top-down, left-to-right manner across a
-/// data structure. The `M: MutateForAll<R>` queries individual values, while the `F:
+/// data structure. The `M: GenericMutate<R>` queries individual values, while the `F:
 /// FnMut(R, R) -> R` joins the results of multiple queries into a single
 /// result.
 #[derive(Debug)]
 pub struct MutateEverything<M, R, F>
 where
-    M: MutateForAll<R>,
+    M: GenericMutate<R>,
     F: FnMut(R, R) -> R,
 {
     m: M,
@@ -98,7 +98,7 @@ where
 
 impl<M, R, F> MutateEverything<M, R, F>
 where
-    M: MutateForAll<R>,
+    M: GenericMutate<R>,
     F: FnMut(R, R) -> R,
 {
     /// Construct a new `MutateEverything` query traversal.
@@ -114,7 +114,7 @@ where
 
 impl<M> MutateEverything<M, (), fn((), ())>
 where
-    M: MutateForAll<()>,
+    M: GenericMutate<()>,
 {
     /// Construct a new `MutateEverything` query traversal.
     #[inline]
@@ -129,9 +129,9 @@ where
     }
 }
 
-impl<M, R, F> MutateForAll<R> for MutateEverything<M, R, F>
+impl<M, R, F> GenericMutate<R> for MutateEverything<M, R, F>
 where
-    M: MutateForAll<R>,
+    M: GenericMutate<R>,
     F: FnMut(R, R) -> R,
 {
     #[inline]

@@ -1,4 +1,4 @@
-use super::{MutateForAll, QueryForAll, Term, TransformForAll};
+use super::{GenericMutate, GenericQuery, Term, GenericTransform};
 
 macro_rules! impl_trivial_term {
     ( $name:ty ) => {
@@ -6,7 +6,7 @@ macro_rules! impl_trivial_term {
             #[inline]
             fn map_one_transform<F>(self, _: &mut F) -> Self
             where
-                F: TransformForAll,
+                F: GenericTransform,
             {
                 self
             }
@@ -14,14 +14,14 @@ macro_rules! impl_trivial_term {
             #[inline]
             fn map_one_query<Q, R, F>(&self, _: &mut Q, _: F)
             where
-                Q: QueryForAll<R>,
+                Q: GenericQuery<R>,
                 F: FnMut(&mut Q, R),
             {}
 
             #[inline]
             fn map_one_mutation<M, R, F>(&mut self, _: &mut M, _: F)
             where
-                M: MutateForAll<R>,
+                M: GenericMutate<R>,
                 F: FnMut(&mut M, R),
             {}
         }
@@ -41,7 +41,7 @@ where
     #[inline]
     fn map_one_transform<F>(mut self, f: &mut F) -> Vec<T>
     where
-        F: TransformForAll,
+        F: GenericTransform,
     {
         self.drain(..).map(|t| f.transform(t)).collect()
     }
@@ -49,7 +49,7 @@ where
     #[inline]
     fn map_one_query<Q, R, F>(&self, query: &mut Q, mut each: F)
     where
-        Q: QueryForAll<R>,
+        Q: GenericQuery<R>,
         F: FnMut(&mut Q, R),
     {
         self.iter()
@@ -63,7 +63,7 @@ where
     #[inline]
     fn map_one_mutation<M, R, F>(&mut self, mutation: &mut M, mut each: F)
     where
-        M: MutateForAll<R>,
+        M: GenericMutate<R>,
         F: FnMut(&mut M, R),
     {
         self.iter_mut()
@@ -82,7 +82,7 @@ where
     #[inline]
     fn map_one_transform<F>(self, f: &mut F) -> Box<T>
     where
-        F: TransformForAll,
+        F: GenericTransform,
     {
         Box::new(f.transform(*self))
     }
@@ -90,7 +90,7 @@ where
     #[inline]
     fn map_one_query<Q, R, F>(&self, query: &mut Q, mut each: F)
     where
-        Q: QueryForAll<R>,
+        Q: GenericQuery<R>,
         F: FnMut(&mut Q, R),
     {
         let r = query.query(&**self);
@@ -100,7 +100,7 @@ where
     #[inline]
     fn map_one_mutation<M, R, F>(&mut self, mutation: &mut M, mut each: F)
     where
-        M: MutateForAll<R>,
+        M: GenericMutate<R>,
         F: FnMut(&mut M, R),
     {
         let r = mutation.mutate(&mut **self);

@@ -1,11 +1,11 @@
-use super::{Cast, QueryForAll, Term};
+use super::{Cast, GenericQuery, Term};
 use std::marker::PhantomData;
 
 /// Work around Rust's lack of higher-rank type polymorphism with a trait that
 /// has a generic `fn transform<T>` method. Essentially, we'd really prefer
 /// taking arguments of type `F: for<T> FnMut(T) -> T` rather than `F:
-/// TransformForAll` but Rust doesn't support them yet (ever?).
-pub trait TransformForAll {
+/// GenericTransform` but Rust doesn't support them yet (ever?).
+pub trait GenericTransform {
     /// Call the transform function on any `T`.
     fn transform<T>(&mut self, t: T) -> T
     where
@@ -40,7 +40,7 @@ where
     }
 }
 
-impl<F, U> TransformForAll for Transformation<F, U>
+impl<F, U> GenericTransform for Transformation<F, U>
 where
     F: FnMut(U) -> U,
 {
@@ -64,14 +64,14 @@ where
 #[derive(Debug)]
 pub struct Everywhere<F>
 where
-    F: TransformForAll,
+    F: GenericTransform,
 {
     f: F,
 }
 
 impl<F> Everywhere<F>
 where
-    F: TransformForAll,
+    F: GenericTransform,
 {
     /// Construct a new transformation traversal.
     #[inline]
@@ -80,9 +80,9 @@ where
     }
 }
 
-impl<F> TransformForAll for Everywhere<F>
+impl<F> GenericTransform for Everywhere<F>
 where
-    F: TransformForAll,
+    F: GenericTransform,
 {
     #[inline]
     fn transform<T>(&mut self, t: T) -> T
@@ -99,8 +99,8 @@ where
 #[derive(Debug)]
 pub struct EverywhereBut<F, P>
 where
-    F: TransformForAll,
-    P: QueryForAll<bool>,
+    F: GenericTransform,
+    P: GenericQuery<bool>,
 {
     p: P,
     f: F,
@@ -108,8 +108,8 @@ where
 
 impl<F, P> EverywhereBut<F, P>
 where
-    F: TransformForAll,
-    P: QueryForAll<bool>,
+    F: GenericTransform,
+    P: GenericQuery<bool>,
 {
     /// Construct a new transformation traversal.
     #[inline]
@@ -118,10 +118,10 @@ where
     }
 }
 
-impl<F, P> TransformForAll for EverywhereBut<F, P>
+impl<F, P> GenericTransform for EverywhereBut<F, P>
 where
-    F: TransformForAll,
-    P: QueryForAll<bool>,
+    F: GenericTransform,
+    P: GenericQuery<bool>,
 {
     #[inline]
     fn transform<T>(&mut self, t: T) -> T

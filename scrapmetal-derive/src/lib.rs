@@ -74,7 +74,7 @@ fn impl_term_for_struct_struct(ast: &syn::DeriveInput, fields: &[syn::Field]) ->
             #[allow(unused_mut)]
             fn map_one_transform<F>(self, f: &mut F) -> Self
             where
-                F: ::scrapmetal::TransformForAll,
+                F: ::scrapmetal::GenericTransform,
             {
                 Self {
                     #( #transforms )*
@@ -86,7 +86,7 @@ fn impl_term_for_struct_struct(ast: &syn::DeriveInput, fields: &[syn::Field]) ->
             #[allow(unused_mut)]
             fn map_one_query<Q, R, F>(&self, q: &mut Q, mut each: F)
             where
-                Q: ::scrapmetal::QueryForAll<R>,
+                Q: ::scrapmetal::GenericQuery<R>,
                 F: FnMut(&mut Q, R),
             {
                 #( #queries )*
@@ -97,7 +97,7 @@ fn impl_term_for_struct_struct(ast: &syn::DeriveInput, fields: &[syn::Field]) ->
             #[allow(unused_mut)]
             fn map_one_mutation<M, R, F>(&mut self, mutation: &mut M, mut each: F)
             where
-                M: ::scrapmetal::MutateForAll<R>,
+                M: ::scrapmetal::GenericMutate<R>,
                 F: FnMut(&mut M, R),
             {
                 #( #mutations )*
@@ -147,7 +147,7 @@ fn impl_term_for_tuple_struct(ast: &syn::DeriveInput, fields: &[syn::Field]) -> 
             #[allow(unused_mut)]
             fn map_one_transform<F>(self, f: &mut F) -> Self
             where
-                F: ::scrapmetal::TransformForAll,
+                F: ::scrapmetal::GenericTransform,
             {
                 #name ( #( #transforms )* )
             }
@@ -157,7 +157,7 @@ fn impl_term_for_tuple_struct(ast: &syn::DeriveInput, fields: &[syn::Field]) -> 
             #[allow(unused_mut)]
             fn map_one_query<Q, R, F>(&self, q: &mut Q, mut each: F)
             where
-                Q: ::scrapmetal::QueryForAll<R>,
+                Q: ::scrapmetal::GenericQuery<R>,
                 F: FnMut(&mut Q, R),
             {
                 #( #queries )*
@@ -168,7 +168,7 @@ fn impl_term_for_tuple_struct(ast: &syn::DeriveInput, fields: &[syn::Field]) -> 
             #[allow(unused_mut)]
             fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut each: F)
             where
-                M: ::scrapmetal::MutateForAll<R>,
+                M: ::scrapmetal::GenericMutate<R>,
                 F: FnMut(&mut M, R),
             {
                 #( #mutations )*
@@ -188,7 +188,7 @@ fn impl_term_for_unit_struct(ast: &syn::DeriveInput) -> Tokens {
             #[inline(always)]
             fn map_one_transform<F>(self, _: &mut F) -> Self
             where
-                F: ::scrapmetal::TransformForAll,
+                F: ::scrapmetal::GenericTransform,
             {
                 self
             }
@@ -196,14 +196,14 @@ fn impl_term_for_unit_struct(ast: &syn::DeriveInput) -> Tokens {
             #[inline(always)]
             fn map_one_query<Q, R, F>(&self, _: &mut Q, _: F)
             where
-                Q: ::scrapmetal::QueryForAll<R>,
+                Q: ::scrapmetal::GenericQuery<R>,
                 F: FnMut(&mut Q, R),
             {}
 
             #[inline(always)]
             fn map_one_mutation<M, R, F>(&mut self, _: &mut M, _: F)
             where
-                M: ::scrapmetal::MutateForAll<R>,
+                M: ::scrapmetal::GenericMutate<R>,
                 F: FnMut(&mut M, R),
             {}
         }
@@ -437,7 +437,7 @@ fn impl_term_for_enum(ast: &syn::DeriveInput, variants: &[syn::Variant]) -> Toke
             #[allow(unused_mut)]
             fn map_one_transform<F>(self, f: &mut F) -> Self
             where
-                F: ::scrapmetal::TransformForAll,
+                F: ::scrapmetal::GenericTransform,
             {
                 match self {
                     #( #transforms )*
@@ -449,7 +449,7 @@ fn impl_term_for_enum(ast: &syn::DeriveInput, variants: &[syn::Variant]) -> Toke
             #[allow(unused_mut)]
             fn map_one_query<Q, R, F>(&self, q: &mut Q, mut each: F)
             where
-                Q: ::scrapmetal::QueryForAll<R>,
+                Q: ::scrapmetal::GenericQuery<R>,
                 F: FnMut(&mut Q, R),
             {
                 match *self {
@@ -462,7 +462,7 @@ fn impl_term_for_enum(ast: &syn::DeriveInput, variants: &[syn::Variant]) -> Toke
             #[allow(unused_mut)]
             fn map_one_mutation<M, R, F>(&mut self, m: &mut M, mut each: F)
             where
-                M: ::scrapmetal::MutateForAll<R>,
+                M: ::scrapmetal::GenericMutate<R>,
                 F: FnMut(&mut M, R),
             {
                 match *self {
