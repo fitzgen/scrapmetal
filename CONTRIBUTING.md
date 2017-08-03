@@ -10,7 +10,7 @@ out to us in a GitHub issue, or stop by [#rust on irc.mozilla.org](irc://irc.moz
 
 - [Code of Conduct](#code-of-conduct)
 - [Filing an Issue](#filing-an-issue)
-- [Looking to Start Contributing to `bindgen`?](#looking-to-start-contributing-to-bindgen)
+- [Looking to Start Contributing to `scrapmetal`?](#looking-to-start-contributing-to-scrapmetal)
 - [Building](#building)
 - [Testing](#testing)
 - [Automatic code formatting](#automatic-code-formatting)
