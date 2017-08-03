@@ -216,7 +216,6 @@ where
 // enum std::thread::LocalKeyState
 // struct std::any::TypeId
 // struct std::ascii::EscapeDefault
-// struct std::boxed::Box
 // struct std::cell::BorrowError
 // struct std::cell::BorrowMutError
 // struct std::cell::Cell
@@ -473,7 +472,6 @@ where
 // struct std::vec::IntoIter
 // struct std::vec::PlaceBack
 // struct std::vec::Splice
-// struct std::vec::Vec
 // trait std::any::Any
 // trait std::fmt::Debug
 // trait std::io::Write
