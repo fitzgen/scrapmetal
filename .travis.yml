@@ -1,0 +1,18 @@
+sudo: false
+language: rust
+
+rust:
+  - nightly
+
+cache: cargo
+
+env:
+  matrix:
+    - JOB="test"  PROFILE=""          FEATURES=""
+    - JOB="test"  PROFILE="--release" FEATURES=""
+    - JOB="bench" PROFILE="--release" FEATURES=""
+
+matrix:
+  fast_finish: true
+
+script: ./ci/script.sh
