@@ -30,9 +30,14 @@ macro_rules! impl_trivial_term {
 
 impl_trivial_term!(&'static str);
 impl_trivial_term!(bool);
-impl_trivial_term!(f64);
 impl_trivial_term!(char);
+impl_trivial_term!(f32);
+impl_trivial_term!(f64);
 impl_trivial_term!(usize);
+impl_trivial_term!(u8);
+impl_trivial_term!(u16);
+impl_trivial_term!(u32);
+impl_trivial_term!(u64);
 
 impl<T> Term for Vec<T>
 where
