@@ -38,6 +38,11 @@ impl_trivial_term!(u8);
 impl_trivial_term!(u16);
 impl_trivial_term!(u32);
 impl_trivial_term!(u64);
+impl_trivial_term!(isize);
+impl_trivial_term!(i8);
+impl_trivial_term!(i16);
+impl_trivial_term!(i32);
+impl_trivial_term!(i64);
 
 impl<T> Term for Vec<T>
 where
