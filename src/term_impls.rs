@@ -79,7 +79,7 @@ macro_rules! impl_tuple_term {
             #[inline]
             #[allow(non_snake_case)]
             fn map_one_mutation<M, R, FF>(&mut self, m: &mut M, mut each: FF)
-                where
+            where
                 M: GenericMutate<R>,
                 FF: FnMut(&mut M, R),
             {
