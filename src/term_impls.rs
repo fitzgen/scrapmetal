@@ -1,4 +1,4 @@
-use super::{GenericMutate, GenericQuery, Term, GenericTransform};
+use super::{GenericMutate, GenericQuery, GenericTransform, Term};
 
 macro_rules! impl_trivial_term {
     ( $name:ty ) => {
