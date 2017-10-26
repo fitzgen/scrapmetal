@@ -1,5 +1,8 @@
 use super::{GenericMutate, GenericQuery, GenericTransform, Term};
 
+use std::collections::*;
+use std::iter::FromIterator;
+
 macro_rules! impl_trivial_term {
     ( $name:ty ) => {
         impl Term for $name {
@@ -182,6 +185,49 @@ where
     }
 }
 
+macro_rules! impl_iter_term {
+  ($iter:ty) => {
+        impl <T> Term for $iter where
+        $iter: IntoIterator < Item = T> + FromIterator < T >,
+        for < 'b> & 'b $iter: IntoIterator < Item = &'b T >,
+        for < 'b > & 'b mut $iter: IntoIterator < Item = & 'b mut T >,
+        T: Term
+        {
+        fn map_one_transform < F > ( self, f: & mut F) -> $iter where
+        F: GenericTransform {
+        self.into_iter().map( | x| f.transform(x)).collect()
+        }
+
+        fn map_one_query < Q, R, F > (& self, query: & mut Q, mut each: F) where
+        Q: GenericQuery < R>,
+        F: FnMut( & mut Q, R) {
+        let iter = & mut self.into_iter();
+        iter.for_each( | t | {
+        let r = query.query(t);
+        each(query, r);
+        })
+        }
+
+        fn map_one_mutation < 'a, M, R, F> ( & 'a mut self, mutation: &mut M, mut each: F) where
+        M: GenericMutate < R >,
+        F: FnMut(& mut M, R) {
+        let ref mut coll = * self;
+        let iter = & mut coll.into_iter();
+        iter.for_each( | t: &mut T | {
+        let r = mutation.mutate(t);
+        each(mutation, r);
+        });
+        }
+        }
+    }
+}
+
+impl_iter_term!(LinkedList<T>);
+impl_iter_term!(HashSet<T>);
+impl_iter_term!(BTreeSet<T>);
+impl_iter_term!(BinaryHeap<T>);
+impl_iter_term!(VecDeque<T>);
+
 // TODO
 //
 // Below are all the stable `std` types that implement `Debug`, which I figure
@@ -231,8 +277,6 @@ where
 // struct std::char::EscapeUnicode
 // struct std::cmp::Reverse
 // struct std::collections::HashMap
-// struct std::collections::HashSet
-// struct std::collections::binary_heap::BinaryHeap
 // struct std::collections::binary_heap::BinaryHeapPlace
 // struct std::collections::binary_heap::Drain
 // struct std::collections::binary_heap::IntoIter
@@ -249,7 +293,6 @@ where
 // struct std::collections::btree_map::VacantEntry
 // struct std::collections::btree_map::Values
 // struct std::collections::btree_map::ValuesMut
-// struct std::collections::btree_set::BTreeSet
 // struct std::collections::btree_set::Difference
 // struct std::collections::btree_set::Intersection
 // struct std::collections::btree_set::IntoIter
@@ -271,14 +314,12 @@ where
 // struct std::collections::linked_list::IntoIter
 // struct std::collections::linked_list::Iter
 // struct std::collections::linked_list::IterMut
-// struct std::collections::linked_list::LinkedList
 // struct std::collections::vec_deque::Drain
 // struct std::collections::vec_deque::IntoIter
 // struct std::collections::vec_deque::Iter
 // struct std::collections::vec_deque::IterMut
 // struct std::collections::vec_deque::PlaceBack
 // struct std::collections::vec_deque::PlaceFront
-// struct std::collections::vec_deque::VecDeque
 // struct std::env::Args
 // struct std::env::ArgsOs
 // struct std::env::JoinPathsError
