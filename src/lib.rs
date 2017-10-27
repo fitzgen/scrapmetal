@@ -14,9 +14,7 @@ mod term_impls;
 mod transform;
 
 pub use mutation::*;
-
 pub use query::*;
-
 pub use transform::*;
 
 /// Dynamically cast a value to a `T`.

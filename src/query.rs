@@ -120,10 +120,9 @@ where
         T: Term,
     {
         let mut r = Some(self.q.query(t));
-        t.map_one_query(
-            self,
-            |me, rr| { r = Some((me.fold)(r.take().unwrap(), rr)); },
-        );
+        t.map_one_query(self, |me, rr| {
+            r = Some((me.fold)(r.take().unwrap(), rr));
+        });
         r.unwrap()
     }
 }
