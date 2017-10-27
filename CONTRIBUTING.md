@@ -66,6 +66,7 @@ We use [`rustfmt`](https://github.com/rust-lang-nursery/rustfmt) to enforce a co
 You can install the latest version of `rustfmt` with this command:
 
 ```
+$ rustup update nightly
 $ cargo install -f rustfmt-nightly
 ```
 
