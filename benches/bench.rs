@@ -5,7 +5,9 @@ extern crate test;
 
 #[bench]
 fn bench_increase_with_boilerplate(b: &mut test::Bencher) {
-    b.iter(|| { test::black_box(Company::default().increase(1.0)); });
+    b.iter(|| {
+        test::black_box(Company::default().increase(1.0));
+    });
 }
 
 #[bench]
@@ -41,7 +43,9 @@ fn bench_increase_in_place_scrapping_boilerplate(b: &mut test::Bencher) {
 #[bench]
 fn bench_highest_salary_with_boilerplate(b: &mut test::Bencher) {
     let company = Company::default();
-    b.iter(|| { test::black_box(company.highest_salary()); });
+    b.iter(|| {
+        test::black_box(company.highest_salary());
+    });
 }
 
 #[bench]
@@ -49,5 +53,7 @@ fn bench_highest_salary_scrapping_boilerplate(b: &mut test::Bencher) {
     let query = Query::new(|e: &Employee| Some(e.1.clone()));
     let mut highest_salary = Everything::new(query, cmp::max);
     let company = Company::default();
-    b.iter(|| { test::black_box(highest_salary.query(&company)); });
+    b.iter(|| {
+        test::black_box(highest_salary.query(&company));
+    });
 }

@@ -19,7 +19,7 @@ pub struct Department(pub Name, pub Manager, pub Vec<SubUnit>);
 pub enum SubUnit {
     Person(Employee),
     Department(Box<Department>),
-    Group(LinkedList<Employee>)
+    Group(LinkedList<Employee>),
 }
 
 #[derive(Clone, Debug, PartialEq, Term)]
@@ -53,10 +53,8 @@ impl Default for Company {
                     SubUnit::Group(group),
                     SubUnit::Person(joost),
                     SubUnit::Person(marlow),
-                    SubUnit::Department(
-                        Box::new(Department("Funsies", jim, vec![]))
-                    ),
-                ]
+                    SubUnit::Department(Box::new(Department("Funsies", jim, vec![]))),
+                ],
             ),
             Department("Strategy", blair, vec![]),
         ])
@@ -105,8 +103,7 @@ impl Increase for Department {
 impl Increase for SubUnit {
     fn increase(self, k: f64) -> SubUnit {
         match self {
-            SubUnit::Group(g) =>
-                SubUnit::Group(g.into_iter().map(|e|e.increase(k)).collect()),
+            SubUnit::Group(g) => SubUnit::Group(g.into_iter().map(|e| e.increase(k)).collect()),
             SubUnit::Person(e) => SubUnit::Person(e.increase(k)),
             SubUnit::Department(d) => SubUnit::Department(Box::new(d.increase(k))),
         }
@@ -148,7 +145,7 @@ impl IncreaseInPlace for SubUnit {
     fn increase_in_place(&mut self, k: f64) {
         match *self {
             SubUnit::Person(ref mut e) => e.increase_in_place(k),
-            SubUnit::Group(ref mut g) => g.into_iter().for_each(|e|e.increase_in_place(k)),
+            SubUnit::Group(ref mut g) => g.into_iter().for_each(|e| e.increase_in_place(k)),
             SubUnit::Department(ref mut d) => d.increase_in_place(k),
         }
     }
@@ -174,20 +171,20 @@ pub trait HighestSalary {
 
 impl HighestSalary for Company {
     fn highest_salary(&self) -> Option<Salary> {
-        self.0.iter().map(|d| d.highest_salary()).fold(
-            None,
-            cmp::max,
-        )
+        self.0
+            .iter()
+            .map(|d| d.highest_salary())
+            .fold(None, cmp::max)
     }
 }
 
 impl HighestSalary for Department {
     fn highest_salary(&self) -> Option<Salary> {
         let mgr_salary = self.1.highest_salary();
-        let units_highest = self.2.iter().map(|u| u.highest_salary()).fold(
-            None,
-            cmp::max,
-        );
+        let units_highest = self.2
+            .iter()
+            .map(|u| u.highest_salary())
+            .fold(None, cmp::max);
         cmp::max(mgr_salary, units_highest)
     }
 }
@@ -196,7 +193,7 @@ impl HighestSalary for SubUnit {
     fn highest_salary(&self) -> Option<Salary> {
         match *self {
             SubUnit::Person(ref e) => e.highest_salary(),
-            SubUnit::Group(ref g) => g.into_iter().map(|e|e.highest_salary()).max().unwrap(),
+            SubUnit::Group(ref g) => g.into_iter().map(|e| e.highest_salary()).max().unwrap(),
             SubUnit::Department(ref d) => d.highest_salary(),
         }
     }
@@ -225,25 +222,19 @@ fn increase_with_boilerplate() {
                 Employee(Person("Ralf", "Amsterdam"), Salary(8001.0)),
                 vec![
                     SubUnit::Group(group),
-                    SubUnit::Person(Employee(
-                        Person("Joost", "Amsterdam"),
-                        Salary(1001.0),
-                    )),
-                    SubUnit::Person(Employee(
-                        Person("Marlow", "Cambridge"),
-                        Salary(2001.0),
-                    )),
+                    SubUnit::Person(Employee(Person("Joost", "Amsterdam"), Salary(1001.0))),
+                    SubUnit::Person(Employee(Person("Marlow", "Cambridge"), Salary(2001.0))),
                     SubUnit::Department(Box::new(Department(
                         "Funsies",
                         Employee(Person("Jim", "Portland"), Salary(4.0)),
                         vec![],
                     ))),
-                ]
+                ],
             ),
             Department(
                 "Strategy",
                 Employee(Person("Blair", "London"), Salary(100001.0)),
-                vec![]
+                vec![],
             ),
         ])
     );
@@ -266,25 +257,19 @@ fn increase_scrapping_boilerplate() {
                 Employee(Person("Ralf", "Amsterdam"), Salary(8001.0)),
                 vec![
                     SubUnit::Group(group),
-                    SubUnit::Person(Employee(
-                        Person("Joost", "Amsterdam"),
-                        Salary(1001.0),
-                    )),
-                    SubUnit::Person(Employee(
-                        Person("Marlow", "Cambridge"),
-                        Salary(2001.0),
-                    )),
+                    SubUnit::Person(Employee(Person("Joost", "Amsterdam"), Salary(1001.0))),
+                    SubUnit::Person(Employee(Person("Marlow", "Cambridge"), Salary(2001.0))),
                     SubUnit::Department(Box::new(Department(
                         "Funsies",
                         Employee(Person("Jim", "Portland"), Salary(4.0)),
                         vec![],
                     ))),
-                ]
+                ],
             ),
             Department(
                 "Strategy",
                 Employee(Person("Blair", "London"), Salary(100001.0)),
-                vec![]
+                vec![],
             ),
         ])
     );
@@ -305,25 +290,19 @@ fn increase_in_place_with_boilerplate() {
                 Employee(Person("Ralf", "Amsterdam"), Salary(8001.0)),
                 vec![
                     SubUnit::Group(group),
-                    SubUnit::Person(Employee(
-                        Person("Joost", "Amsterdam"),
-                        Salary(1001.0),
-                    )),
-                    SubUnit::Person(Employee(
-                        Person("Marlow", "Cambridge"),
-                        Salary(2001.0),
-                    )),
+                    SubUnit::Person(Employee(Person("Joost", "Amsterdam"), Salary(1001.0))),
+                    SubUnit::Person(Employee(Person("Marlow", "Cambridge"), Salary(2001.0))),
                     SubUnit::Department(Box::new(Department(
                         "Funsies",
                         Employee(Person("Jim", "Portland"), Salary(4.0)),
                         vec![],
                     ))),
-                ]
+                ],
             ),
             Department(
                 "Strategy",
                 Employee(Person("Blair", "London"), Salary(100001.0)),
-                vec![]
+                vec![],
             ),
         ])
     );
@@ -347,25 +326,19 @@ fn increase_in_place_scrapping_boilerplate() {
                 Employee(Person("Ralf", "Amsterdam"), Salary(8001.0)),
                 vec![
                     SubUnit::Group(group),
-                    SubUnit::Person(Employee(
-                        Person("Joost", "Amsterdam"),
-                        Salary(1001.0),
-                    )),
-                    SubUnit::Person(Employee(
-                        Person("Marlow", "Cambridge"),
-                        Salary(2001.0),
-                    )),
+                    SubUnit::Person(Employee(Person("Joost", "Amsterdam"), Salary(1001.0))),
+                    SubUnit::Person(Employee(Person("Marlow", "Cambridge"), Salary(2001.0))),
                     SubUnit::Department(Box::new(Department(
                         "Funsies",
                         Employee(Person("Jim", "Portland"), Salary(4.0)),
                         vec![],
                     ))),
-                ]
+                ],
             ),
             Department(
                 "Strategy",
                 Employee(Person("Blair", "London"), Salary(100001.0)),
-                vec![]
+                vec![],
             ),
         ])
     );

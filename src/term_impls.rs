@@ -1,5 +1,4 @@
 use super::{GenericMutate, GenericQuery, GenericTransform, Term};
-
 use std::collections::*;
 use std::iter::FromIterator;
 
@@ -186,38 +185,42 @@ where
 }
 
 macro_rules! impl_iter_term {
-  ($iter:ty) => {
-        impl <T> Term for $iter where
-        $iter: IntoIterator < Item = T> + FromIterator < T >,
-        for < 'b> & 'b $iter: IntoIterator < Item = &'b T >,
-        for < 'b > & 'b mut $iter: IntoIterator < Item = & 'b mut T >,
-        T: Term
+    ($iter:ty) => {
+        impl <T> Term for $iter
+        where
+            $iter: IntoIterator<Item = T> + FromIterator<T>,
+            for <'b> &'b $iter: IntoIterator<Item = &'b T>,
+            for <'b> &'b mut $iter: IntoIterator<Item = &'b mut T>,
+            T: Term
         {
-        fn map_one_transform < F > ( self, f: & mut F) -> $iter where
-        F: GenericTransform {
-        self.into_iter().map( | x| f.transform(x)).collect()
-        }
+            fn map_one_transform<F>(self, f: &mut F) -> $iter
+            where
+                F: GenericTransform
+            {
+                self.into_iter().map(|x| f.transform(x)).collect()
+            }
 
-        fn map_one_query < Q, R, F > (& self, query: & mut Q, mut each: F) where
-        Q: GenericQuery < R>,
-        F: FnMut( & mut Q, R) {
-        let iter = & mut self.into_iter();
-        iter.for_each( | t | {
-        let r = query.query(t);
-        each(query, r);
-        })
-        }
+            fn map_one_query<Q, R, F>(&self, query: &mut Q, mut each: F)
+            where
+                Q: GenericQuery<R>,
+                F: FnMut(&mut Q, R)
+            {
+                self.into_iter().for_each(|t| {
+                    let r = query.query(t);
+                    each(query, r);
+                });
+            }
 
-        fn map_one_mutation < 'a, M, R, F> ( & 'a mut self, mutation: &mut M, mut each: F) where
-        M: GenericMutate < R >,
-        F: FnMut(& mut M, R) {
-        let ref mut coll = * self;
-        let iter = & mut coll.into_iter();
-        iter.for_each( | t: &mut T | {
-        let r = mutation.mutate(t);
-        each(mutation, r);
-        });
-        }
+            fn map_one_mutation<'a, M, R, F>(&'a mut self, mutation: &mut M, mut each: F)
+            where
+                M: GenericMutate<R>,
+                F: FnMut(&mut M, R)
+            {
+                self.into_iter().for_each(|t: &mut T| {
+                    let r = mutation.mutate(t);
+                    each(mutation, r);
+                });
+            }
         }
     }
 }
