@@ -94,8 +94,9 @@ where
     }
 }
 
-/// Recursively perform a transformation in a bottom up manner across a complete
-/// data structure.
+/// Recursively perform a transformation in a bottom up manner across a
+/// data structure, ignoring branches where the given query
+/// evaluates to false
 #[derive(Debug)]
 pub struct EverywhereBut<F, P>
 where
