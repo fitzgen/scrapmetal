@@ -231,6 +231,51 @@ impl_iter_term!(BTreeSet<T>);
 impl_iter_term!(BinaryHeap<T>);
 impl_iter_term!(VecDeque<T>);
 
+
+macro_rules! impl_iterkey_term {
+    ($iter:ty) => {
+        impl <K,T> Term for $iter
+        where
+            $iter: IntoIterator<Item = (K,T)> + FromIterator<(K,T)>,
+            for <'b> &'b $iter: IntoIterator<Item = &'b (K,T)>,
+            for <'b> &'b mut $iter: IntoIterator<Item = &'b mut (K,T)>,
+            (K,T): Term
+        {
+            fn map_one_transform<F>(self, f: &mut F) -> $iter
+            where
+                F: GenericTransform
+            {
+                self.into_iter().map(|x| f.transform(x)).collect()
+            }
+
+            fn map_one_query<Q, R, F>(&self, query: &mut Q, mut each: F)
+            where
+                Q: GenericQuery<R>,
+                F: FnMut(&mut Q, R)
+            {
+                self.into_iter().for_each(|t| {
+                    let r = query.query(t);
+                    each(query, r);
+                });
+            }
+
+            fn map_one_mutation<'a, M, R, F>(&'a mut self, mutation: &mut M, mut each: F)
+            where
+                M: GenericMutate<R>,
+                F: FnMut(&mut M, R)
+            {
+                self.into_iter().for_each(|t: &mut (K,T)| {
+                    let r = mutation.mutate(t);
+                    each(mutation, r);
+                });
+            }
+        }
+    }
+}
+
+impl_iterkey_term!(HashMap<K,T>);
+impl_iterkey_term!(BTreeMap<K,T>);
+
 // TODO
 //
 // Below are all the stable `std` types that implement `Debug`, which I figure
@@ -279,13 +324,11 @@ impl_iter_term!(VecDeque<T>);
 // struct std::char::EscapeDefault
 // struct std::char::EscapeUnicode
 // struct std::cmp::Reverse
-// struct std::collections::HashMap
 // struct std::collections::binary_heap::BinaryHeapPlace
 // struct std::collections::binary_heap::Drain
 // struct std::collections::binary_heap::IntoIter
 // struct std::collections::binary_heap::Iter
 // struct std::collections::binary_heap::PeekMut
-// struct std::collections::btree_map::BTreeMap
 // struct std::collections::btree_map::IntoIter
 // struct std::collections::btree_map::Iter
 // struct std::collections::btree_map::IterMut
